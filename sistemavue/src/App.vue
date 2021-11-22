@@ -37,7 +37,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item :to="{name: ''}">
+            <v-list-item :to="{name: 'articulo'}">
               <v-list-item-action>
                 <v-icon>table_chart</v-icon>
               </v-list-item-action>
@@ -58,7 +58,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item :to="{name: ''}">
+            <v-list-item :to="{name: 'ingreso'}">
               <v-list-item-action>
                 <v-icon>table_chart</v-icon>
               </v-list-item-action>
@@ -68,7 +68,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item :to="{name: ''}">
+            <v-list-item :to="{name: 'proveedor'}">
               <v-list-item-action>
                 <v-icon>table_chart</v-icon>
               </v-list-item-action>
@@ -89,7 +89,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item :to="{name: ''}">
+            <v-list-item :to="{name: 'venta'}">
               <v-list-item-action>
                 <v-icon>table_chart</v-icon>
               </v-list-item-action>
@@ -99,7 +99,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item :to="{name: ''}">
+            <v-list-item :to="{name: 'cliente'}">
               <v-list-item-action>
                 <v-icon>table_chart</v-icon>
               </v-list-item-action>
@@ -184,13 +184,13 @@
         <v-icon>apps</v-icon> Login
       </v-btn>
     </v-app-bar>
-    <v-content>
+    <v-main>
       <v-container fluid fill-height>
         <v-slide-y-transition mode="out-in">
           <router-view/>
         </v-slide-y-transition>
       </v-container>
-    </v-content>
+    </v-main>
 
     <v-footer height="auto">
       <v-layout justify-center>

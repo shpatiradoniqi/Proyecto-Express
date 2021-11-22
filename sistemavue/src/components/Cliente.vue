@@ -2,7 +2,7 @@
     <v-layout align-start>
         <v-flex>
             <v-toolbar flat color="white">
-                <v-toolbar-title>Categorías</v-toolbar-title>
+                <v-toolbar-title>Clientes</v-toolbar-title>
                 <v-divider
                 class="mx-2"
                 inset
@@ -24,10 +24,29 @@
                         <v-container grid-list-md>
                             <v-layout wrap>
                                 <v-flex xs12 sm12 md12>
-                                    <v-text-field v-model="nombre" label="Nombre"></v-text-field>
+                                    <v-text-field v-model="nombre" label="Nombre">                                        
+                                    </v-text-field>
                                 </v-flex>
-                                <v-flex xs12 sm12 md12>
-                                    <v-text-field v-model="descripcion" label="Descripción"></v-text-field>
+                                <v-flex xs12 sm6 md6>
+                                    <v-select v-model="tipo_documento"
+                                    :items="documentos" label="Tipo Documento">
+                                    </v-select>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field v-model="num_documento" label="Número Documento">
+                                    </v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field v-model="direccion" label="Dirección">
+                                    </v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field v-model="telefono" label="Teléfono">
+                                    </v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field v-model="email" label="Email">
+                                    </v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md12 v-show="valida">
                                     <div class="red--text" v-for="v in validaMensaje" :key="v" v-text="v">
@@ -58,13 +77,13 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn @click="activarDesactivarCerrar()" color="green darken-1" text="text">
+                            <v-btn @click="activarDesactivarCerrar()" color="green darken-1" flat="flat">
                                 Cancelar
                             </v-btn>
-                            <v-btn v-if="adAccion==1" @click="activar()" color="orange darken-4" text="text">
+                            <v-btn v-if="adAccion==1" @click="activar()" color="orange darken-4" flat="flat">
                                 Activar
                             </v-btn>
-                            <v-btn v-if="adAccion==2" @click="desactivar()" color="orange darken-4" text="text">
+                            <v-btn v-if="adAccion==2" @click="desactivar()" color="orange darken-4" flat="flat">
                                 Desactivar
                             </v-btn>
                         </v-card-actions>
@@ -73,16 +92,17 @@
             </v-toolbar>
             <v-data-table
                 :headers="headers"
-                :items="categorias"
+                :items="personas"
                 :search="search"
                 class="elevation-1"
             >
                 <template v-slot:items="props">
                 <td class="justify-center layout px-0">
-                    <v-icon 
-                    small 
+                    <v-icon
+                    small
                     class="mr-2"
-                    @click="editItem(props.item)">
+                    @click="editItem(props.item)"
+                    >
                     edit
                     </v-icon>
                     <template v-if="props.item.estado">
@@ -103,7 +123,12 @@
                     </template>
                 </td>
                 <td>{{ props.item.nombre }}</td>
-                <td>{{ props.item.descripcion }}</td>
+                <td>{{ props.item.tipo_persona }}</td>
+                <td>{{ props.item.tipo_documento }}</td>
+                <td>{{ props.item.num_documento }}</td>
+                <td>{{ props.item.direccion }}</td>
+                <td>{{ props.item.telefono }}</td>
+                <td>{{ props.item.email }}</td>
                 <td>
                     <div v-if="props.item.estado">
                         <span class="blue--text">Activo</span>
@@ -127,17 +152,28 @@
             return{
                 dialog: false,
                 search:'',
-                categorias:[],
+                personas:[],
                 headers: [
                     { text: 'Opciones', value: 'opciones', sortable: false },
                     { text: 'Nombre', value: 'nombre', sortable: true },
-                    { text: 'Descripción', value: 'descripcion', sortable: false },
-                    { text: 'Estado', value: 'estado', sortable: false },
+                    { text: 'Tipo Persona', value: 'tipo_persona', sortable: true },
+                    { text: 'Tipo Documento', value: 'tipo_documento', sortable: true },
+                    { text: 'Número Documento', value: 'num_documento', sortable: false  },
+                    { text: 'Dirección', value: 'direccion', sortable: false  },
+                    { text: 'Teléfono', value: 'telefono', sortable: false  },
+                    { text: 'Email', value: 'email', sortable: false  },
+                    { text: 'Estado', value: 'estado', sortable: false  } 
                 ],
                 editedIndex: -1,
                 _id:'',
                 nombre:'',
-                descripcion:'',
+                tipo_persona:'Cliente',
+                tipo_documento:'',
+                documentos: ['DNI','RUC','PASAPORTE','CEDULA'],
+                num_documento: '',
+                direccion: '',
+                telefono: '',
+                email: '',
                 valida:0,
                 validaMensaje:[],
                 adModal:0,
@@ -163,9 +199,9 @@
             listar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
-                let configuracion= {headers: header};
-                axios.get('categoria/list',configuracion).then(function (response){
-                    me.categorias=response.data;
+                let configuracion= {headers : header};            
+                axios.get('persona/listClientes',configuracion).then(function (response){
+                    me.personas=response.data;
                 }).catch(function(error){
                     console.log(error);
                 });
@@ -174,7 +210,10 @@
             limpiar(){
                 this._id='';
                 this.nombre='';
-                this.descripcion='';
+                this.num_documento='';
+                this.direccion='';
+                this.telefono='';
+                this.email='';
                 this.valida=0;
                 this.validaMensaje=[];
                 this.editedIndex=-1;
@@ -183,10 +222,19 @@
                 this.valida=0;
                 this.validaMensaje=[];
                 if(this.nombre.length<1 || this.nombre.length>50){
-                    this.validaMensaje.push('El nombre de la categoría debe tener entre 1-50 caracteres.');
+                    this.validaMensaje.push('El nombre de la persona debe tener entre 1-50 caracteres.');
                 }
-                if(this.descripcion.length>255){
-                    this.validaMensaje.push('La descripción de la categoría no debe tener más de 255 caracteres.');
+                if(this.num_documento.length>20){
+                    this.validaMensaje.push('El documento no debe tener más de 20 caracteres.');
+                }
+                if(this.direccion.length>70){
+                    this.validaMensaje.push('La dirección no debe tener más de 70 caracteres.');
+                }
+                if(this.telefono.length>20){
+                    this.validaMensaje.push('El teléfono no debe tener más de 20 caracteres.');
+                }
+                if(this.nombre.length>50){
+                    this.validaMensaje.push('El email del usuario debe tener menos de 50 caracteres.');
                 }
                 if (this.validaMensaje.length){
                     this.valida=1;
@@ -196,13 +244,22 @@
             guardar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
-                let configuracion= {headers: header};
+                let configuracion= {headers : header};
                 if (this.validar()){
                     return;
                 }
                 if (this.editedIndex >-1){
                     //Código para editar
-                    axios.put('categoria/update',{'_id':this._id,'nombre':this.nombre,'descripcion':this.descripcion},configuracion)
+                    axios.put('persona/update',{
+                        '_id':this._id,
+                        'tipo_persona':this.tipo_persona,
+                        'nombre':this.nombre,
+                        'tipo_documento':this.tipo_documento,
+                        'num_documento':this.num_documento,
+                        'direccion':this.direccion,
+                        'telefono': this.telefono,
+                        'email':this.email
+                    },configuracion)
                     .then(function(response){
                         me.limpiar();
                         me.close();
@@ -213,7 +270,16 @@
                     });
                 }else{
                     //Código para guardar
-                    axios.post('categoria/add',{'nombre':this.nombre,'descripcion':this.descripcion},configuracion)
+                    axios.post('persona/add',
+                    {
+                        'tipo_persona':this.tipo_persona,
+                        'nombre':this.nombre,
+                        'tipo_documento':this.tipo_documento,
+                        'num_documento':this.num_documento,
+                        'direccion':this.direccion,
+                        'telefono': this.telefono,
+                        'email':this.email
+                    },configuracion)
                     .then(function(response){
                         me.limpiar();
                         me.close();
@@ -226,8 +292,14 @@
             },
             editItem (item) {
                 this._id=item._id;
+                this.rol=item.rol;
                 this.nombre=item.nombre;
-                this.descripcion=item.descripcion;
+                this.tipo_documento=item.tipo_documento;
+                this.num_documento=item.num_documento;
+                this.direccion=item.direccion;
+                this.telefono=item.telefono;
+                this.email=item.email;
+                this.password=item.password;
                 this.dialog = true;
                 this.editedIndex=1;
             },
@@ -249,8 +321,8 @@
             activar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
-                let configuracion= {headers: header};
-                axios.put('categoria/activate',{'_id':this.adId},configuracion)
+                let configuracion= {headers : header};
+                axios.put('persona/activate',{'_id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;
@@ -265,15 +337,15 @@
             desactivar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
-                let configuracion= {headers: header};
-                axios.put('categoria/deactivate',{'_id':this.adId},configuracion)
-                    .then((response) => {
-                        me.adModal=0
-                        me.adAccion=0
-                        me.adNombre=''
-                        me.adId=''
-                        me.listar()
-                      })
+                let configuracion= {headers : header};
+                axios.put('persona/deactivate',{'_id':this.adId},configuracion)
+                    .then(function(response){
+                        me.adModal=0;
+                        me.adAccion=0;
+                        me.adNombre='';
+                        me.adId='';
+                        me.listar();
+                    })
                     .catch(function(error){
                         console.log(error);
                     });

@@ -2,7 +2,10 @@
     <v-layout align-start>
         <v-flex>
             <v-toolbar flat color="white">
-                <v-toolbar-title>Categorías</v-toolbar-title>
+                <v-btn @click="crearPDF()">
+                    <v-icon>print</v-icon>
+                </v-btn>
+                <v-toolbar-title>Artículos</v-toolbar-title>
                 <v-divider
                 class="mx-2"
                 inset
@@ -23,11 +26,31 @@
                         <v-card-text>
                         <v-container grid-list-md>
                             <v-layout wrap>
-                                <v-flex xs12 sm12 md12>
-                                    <v-text-field v-model="nombre" label="Nombre"></v-text-field>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field v-model="codigo" label="Código">                                        
+                                    </v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-select v-model="categoria"
+                                        :items="categorias"
+                                        label="Categoría">
+                                    </v-select>
                                 </v-flex>
                                 <v-flex xs12 sm12 md12>
-                                    <v-text-field v-model="descripcion" label="Descripción"></v-text-field>
+                                    <v-text-field v-model="nombre" label="Nombre">                                        
+                                    </v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field type="number" v-model="stock" label="Stock">                                        
+                                    </v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field v-model="precio_venta" label="precio_venta">                                        
+                                    </v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm12 md12>
+                                    <v-text-field v-model="descripcion" label="Descripción">                                        
+                                    </v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md12 v-show="valida">
                                     <div class="red--text" v-for="v in validaMensaje" :key="v" v-text="v">
@@ -58,13 +81,13 @@
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn @click="activarDesactivarCerrar()" color="green darken-1" text="text">
+                            <v-btn @click="activarDesactivarCerrar()" color="green darken-1" flat="flat">
                                 Cancelar
                             </v-btn>
-                            <v-btn v-if="adAccion==1" @click="activar()" color="orange darken-4" text="text">
+                            <v-btn v-if="adAccion==1" @click="activar()" color="orange darken-4" flat="flat">
                                 Activar
                             </v-btn>
-                            <v-btn v-if="adAccion==2" @click="desactivar()" color="orange darken-4" text="text">
+                            <v-btn v-if="adAccion==2" @click="desactivar()" color="orange darken-4" flat="flat">
                                 Desactivar
                             </v-btn>
                         </v-card-actions>
@@ -73,16 +96,17 @@
             </v-toolbar>
             <v-data-table
                 :headers="headers"
-                :items="categorias"
+                :items="articulos"
                 :search="search"
                 class="elevation-1"
             >
                 <template v-slot:items="props">
                 <td class="justify-center layout px-0">
-                    <v-icon 
-                    small 
+                    <v-icon
+                    small
                     class="mr-2"
-                    @click="editItem(props.item)">
+                    @click="editItem(props.item)"
+                    >
                     edit
                     </v-icon>
                     <template v-if="props.item.estado">
@@ -102,7 +126,11 @@
                         </v-icon>
                     </template>
                 </td>
+                <td>{{ props.item.codigo }}</td>
                 <td>{{ props.item.nombre }}</td>
+                <td>{{ props.item.categoria.nombre }}</td>
+                <td>{{ props.item.stock }}</td>
+                <td>{{ props.item.precio_venta }}</td>
                 <td>{{ props.item.descripcion }}</td>
                 <td>
                     <div v-if="props.item.estado">
@@ -122,21 +150,32 @@
 </template>
 <script>
     import axios from 'axios'
+    import jsPDF from 'jspdf'
+    import 'jspdf-autotable';
     export default {
         data(){
             return{
                 dialog: false,
                 search:'',
-                categorias:[],
+                articulos:[],
                 headers: [
                     { text: 'Opciones', value: 'opciones', sortable: false },
-                    { text: 'Nombre', value: 'nombre', sortable: true },
-                    { text: 'Descripción', value: 'descripcion', sortable: false },
-                    { text: 'Estado', value: 'estado', sortable: false },
+                    { text: 'Código',value: 'codigo', sortable: false},
+                    { text: 'Nombre',value: 'nombre', sortable: true},
+                    { text: 'Categoría',value: 'categoria.nombre', sortable: true},
+                    { text: 'Stock',value: 'stock', sortable: false},
+                    { text: 'Precio Venta',value: 'precio_venta', sortable: false},
+                    { text: 'Descripción', value: 'descripcion', sortable: false },              
+                    { text: 'Estado', value: 'estado', sortable: false }
                 ],
                 editedIndex: -1,
                 _id:'',
+                categoria:'',
+                categorias:[],
+                codigo: '',
                 nombre:'',
+                stock:0,
+                precio_venta:0,
                 descripcion:'',
                 valida:0,
                 validaMensaje:[],
@@ -157,23 +196,71 @@
             }
         },
         created () {
-            this.listar()
+            this.listar();
+            this.selectCategoria();
         },
         methods: {
-            listar(){
+            crearPDF(){
+                var columns =[
+                    {title: "Nombre", dataKey: "nombre"},
+                    {title: "Código", dataKey: "codigo"},
+                    {title: "Categoría", dataKey: "categoria"},  
+                    {title: "Stock", dataKey: "stock"},
+                    {title: "Precio Venta", dataKey: "precio_venta"}
+                ];
+                var rows=[];
+
+                this.articulos.map((x) => {
+                    rows.push(
+                      {
+                        nombre: x.nombre,
+                        codigo: x.codigo,
+                        categoria: x.categoria.nombre,
+                        stock: x.stock,
+                        precio_venta: x.precio_venta
+                      }
+                    );
+                  });                
+                var doc = new jsPDF('p','pt');
+                doc.autoTable(columns,rows,{
+                    margin: {top: 60},
+                    addPageContent: function(data) {
+                        doc.text("Lista de Artículos", 40, 30);
+                    }
+                });
+
+                doc.save('Articulos.pdf');
+            },
+            selectCategoria(){
                 let me=this;
+                let categoriaArray=[];
                 let header={"Token" : this.$store.state.token};
-                let configuracion= {headers: header};
+                let configuracion= {headers : header};            
                 axios.get('categoria/list',configuracion).then(function (response){
-                    me.categorias=response.data;
+                    categoriaArray=response.data;
+                    categoriaArray.map(function(x){
+                        me.categorias.push({text:x.nombre, value:x._id});
+                    });
                 }).catch(function(error){
                     console.log(error);
                 });
-
+            },
+            listar(){
+                let me=this;
+                let header={"Token" : this.$store.state.token};
+                let configuracion= {headers : header};            
+                axios.get('articulo/list',configuracion).then(function (response){
+                    me.articulos=response.data;
+                }).catch(function(error){
+                    console.log(error);
+                });
             },
             limpiar(){
                 this._id='';
                 this.nombre='';
+                this.codigo='';
+                this.stock=0;
+                this.precio_venta=0;
                 this.descripcion='';
                 this.valida=0;
                 this.validaMensaje=[];
@@ -182,11 +269,23 @@
             validar(){
                 this.valida=0;
                 this.validaMensaje=[];
+                if (!this.categoria){
+                    this.validaMensaje.push('Seleccione una categoría');
+                }
+                if (this.codigo.length>64){
+                    this.validaMensaje.push('El código no debe tener más de 64 caracteres');
+                }
                 if(this.nombre.length<1 || this.nombre.length>50){
-                    this.validaMensaje.push('El nombre de la categoría debe tener entre 1-50 caracteres.');
+                    this.validaMensaje.push('El nombre del artículo debe tener entre 1-50 caracteres.');
                 }
                 if(this.descripcion.length>255){
-                    this.validaMensaje.push('La descripción de la categoría no debe tener más de 255 caracteres.');
+                    this.validaMensaje.push('La descripción del artículo no debe tener más de 255 caracteres.');
+                }
+                if (this.stock<0){
+                    this.validaMensaje.push('Ingrese un stock valido');
+                }
+                if (this.precio_venta<0){
+                    this.validaMensaje.push('Ingrese un precio de venta valido');
                 }
                 if (this.validaMensaje.length){
                     this.valida=1;
@@ -196,13 +295,22 @@
             guardar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
-                let configuracion= {headers: header};
+                let configuracion= {headers : header};
                 if (this.validar()){
                     return;
                 }
                 if (this.editedIndex >-1){
                     //Código para editar
-                    axios.put('categoria/update',{'_id':this._id,'nombre':this.nombre,'descripcion':this.descripcion},configuracion)
+                    axios.put('articulo/update',
+                    {
+                        '_id':this._id,
+                        'categoria':this.categoria,
+                        'codigo':this.codigo,
+                        'nombre':this.nombre,
+                        'stock':this.stock,
+                        'precio_venta':this.precio_venta,
+                        'descripcion':this.descripcion
+                    },configuracion)
                     .then(function(response){
                         me.limpiar();
                         me.close();
@@ -213,7 +321,15 @@
                     });
                 }else{
                     //Código para guardar
-                    axios.post('categoria/add',{'nombre':this.nombre,'descripcion':this.descripcion},configuracion)
+                    axios.post('articulo/add',
+                    {
+                        'categoria':this.categoria,
+                        'codigo':this.codigo,
+                        'nombre':this.nombre,
+                        'stock':this.stock,
+                        'precio_venta':this.precio_venta,
+                        'descripcion':this.descripcion
+                    },configuracion)
                     .then(function(response){
                         me.limpiar();
                         me.close();
@@ -226,7 +342,11 @@
             },
             editItem (item) {
                 this._id=item._id;
+                this.categoria=item.categoria._id;
+                this.codigo=item.codigo;
                 this.nombre=item.nombre;
+                this.stock=item.stock;
+                this.precio_venta=item.precio_venta;
                 this.descripcion=item.descripcion;
                 this.dialog = true;
                 this.editedIndex=1;
@@ -249,8 +369,8 @@
             activar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
-                let configuracion= {headers: header};
-                axios.put('categoria/activate',{'_id':this.adId},configuracion)
+                let configuracion= {headers : header};
+                axios.put('articulo/activate',{'_id':this.adId},configuracion)
                     .then(function(response){
                         me.adModal=0;
                         me.adAccion=0;
@@ -265,14 +385,14 @@
             desactivar(){
                 let me=this;
                 let header={"Token" : this.$store.state.token};
-                let configuracion= {headers: header};
-                axios.put('categoria/deactivate',{'_id':this.adId},configuracion)
+                let configuracion= {headers : header};
+                axios.put('articulo/deactivate',{'_id':this.adId},configuracion)
                     .then((response) => {
-                        me.adModal=0
-                        me.adAccion=0
-                        me.adNombre=''
-                        me.adId=''
-                        me.listar()
+                        me.adModal=0;
+                        me.adAccion=0;
+                        me.adNombre='';
+                        me.adId='';
+                        me.listar();
                       })
                     .catch(function(error){
                         console.log(error);
