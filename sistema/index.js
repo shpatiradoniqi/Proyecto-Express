@@ -10,7 +10,8 @@ import router from './routes';
 
 //Conexión a la base de datos MongoDB
 mongoose.Promise=global.Promise;
-const dbUrl = 'mongodb://localhost:27017/dbsistema';
+const dbUrl ='mongodb+srv://dd47671:ayxM7XqyS96r2nbW@incanatoit.2txce.mongodb.net/dbsistema?retryWrites=true&w=majority';
+//const dbUrl = 'mongodb://localhost:27017/dbsistema';
 mongoose.connect(dbUrl, {useNewUrlParser: true})
 .then(mongoose => console.log('Conectado a la BD en el puerto 27017'))
 .catch(err => console.log(err));
