@@ -2,21 +2,21 @@
   <v-layout align-start>
     <v-flex>
       <v-toolbar flat color="white">
-        <v-toolbar-title>Categorías</v-toolbar-title>
+        <v-toolbar-title>Categories</v-toolbar-title>
         <v-divider class="mx-2" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-text-field
           class="text-xs-center"
           v-model="search"
           append-icon="search"
-          label="Búsqueda"
+          label="Search"
           single-line
           hide-details
         ></v-text-field>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on }">
-            <v-btn color="primary" dark class="mb-2" v-on="on">Nuevo</v-btn>
+            <v-btn color="primary" dark class="mb-2" v-on="on">New</v-btn>
           </template>
           <v-card>
             <v-card-title>
@@ -28,13 +28,13 @@
                   <v-flex xs12 sm12 md12>
                     <v-text-field
                       v-model="nombre"
-                      label="Nombre"
+                      label="Name"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
                     <v-text-field
                       v-model="descripcion"
-                      label="Descripción"
+                      label="Description"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12 v-show="valida">
@@ -50,22 +50,22 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" flat @click="close">Cancelar</v-btn>
-              <v-btn color="blue darken-1" flat @click="guardar">Guardar</v-btn>
+              <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click="guardar">Add</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
         <v-dialog v-model="adModal" max-width="290">
           <v-card>
             <v-card-title class="headline" v-if="adAccion == 1">
-              Activar Item
+              Activate Item
             </v-card-title>
             <v-card-title class="headline" v-if="adAccion == 2">
-              Desactivar Item
+              Deactivate Item
             </v-card-title>
             <v-card-text>
-              Estás a punto de <span v-if="adAccion == 1">activar </span>
-              <span v-if="adAccion == 2">desactivar </span> el item
+              You are about to <span v-if="adAccion == 1">activate </span>
+              <span v-if="adAccion == 2">deactivate </span> the item
               {{ adNombre }}
             </v-card-text>
             <v-card-actions>
@@ -75,7 +75,7 @@
                 color="green darken-1"
                 text="text"
               >
-                Cancelar
+                Cancel
               </v-btn>
               <v-btn
                 v-if="adAccion == 1"
@@ -83,7 +83,7 @@
                 color="orange darken-4"
                 text="text"
               >
-                Activar
+                Activate
               </v-btn>
               <v-btn
                 v-if="adAccion == 2"
@@ -91,7 +91,7 @@
                 color="orange darken-4"
                 text="text"
               >
-                Desactivar
+                Deactivate
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -123,15 +123,15 @@
           <td>{{ props.item.descripcion }}</td>
           <td>
             <div v-if="props.item.estado">
-              <span class="blue--text">Activo</span>
+              <span class="blue--text">Active</span>
             </div>
             <div v-else>
-              <span class="red--text">Inactivo</span>
+              <span class="red--text">Offline</span>
             </div>
           </td>
         </template>
         <template v-slot:no-data>
-          <v-btn color="primary" @click="listar()">Resetear</v-btn>
+          <v-btn color="primary" @click="listar()">Reset</v-btn>
         </template>
       </v-data-table>
     </v-flex>
@@ -146,10 +146,10 @@ export default {
       search: "",
       categorias: [],
       headers: [
-        { text: "Opciones", value: "opciones", sortable: false },
-        { text: "Nombre", value: "nombre", sortable: true },
-        { text: "Descripción", value: "descripcion", sortable: false },
-        { text: "Estado", value: "estado", sortable: false },
+        { text: "Options", value: "opciones", sortable: false },
+        { text: "Name", value: "nombre", sortable: true },
+        { text: "Description", value: "descripcion", sortable: false },
+        { text: "State", value: "estado", sortable: false },
       ],
       editedIndex: -1,
       _id: "",
@@ -165,7 +165,7 @@ export default {
   },
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
+      return this.editedIndex === -1 ? "New Registration" : "Edit Register";
     },
   },
   watch: {

@@ -2,7 +2,7 @@
     <v-layout align-start>
         <v-flex>
             <v-toolbar flat color="white">
-                <v-toolbar-title>Clientes</v-toolbar-title>
+                <v-toolbar-title>Clients</v-toolbar-title>
                 <v-divider
                 class="mx-2"
                 inset
@@ -14,7 +14,7 @@
                 <v-spacer></v-spacer>
                 <v-dialog v-model="dialog" max-width="500px">
                     <template v-slot:activator="{ on }">
-                        <v-btn color="primary" dark class="mb-2" v-on="on">Nuevo</v-btn>
+                        <v-btn color="primary" dark class="mb-2" v-on="on">New</v-btn>
                     </template>
                     <v-card>
                         <v-card-title>
@@ -58,33 +58,33 @@
                         </v-card-text>            
                         <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="blue darken-1" flat @click="close">Cancelar</v-btn>
-                        <v-btn color="blue darken-1" flat @click="guardar">Guardar</v-btn>
+                        <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+                        <v-btn color="blue darken-1" flat @click="guardar">Keep</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
                 <v-dialog v-model="adModal" max-width="290">
                     <v-card>
                         <v-card-title class="headline" v-if="adAccion==1">
-                            Activar Item
+                            Activate Item
                         </v-card-title>
                         <v-card-title class="headline" v-if="adAccion==2">
-                            Desactivar Item
+                            Deactivate Item
                         </v-card-title>
                         <v-card-text>
-                            Estás a punto de <span v-if="adAccion==1">activar </span>
-                            <span v-if="adAccion==2">desactivar </span> el item {{adNombre}}
+                            You are about to <span v-if="adAccion==1">activate </span>
+                            <span v-if="adAccion==2">deactivate </span> the item {{adNombre}}
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
                             <v-btn @click="activarDesactivarCerrar()" color="green darken-1" flat="flat">
-                                Cancelar
+                                Cancel
                             </v-btn>
                             <v-btn v-if="adAccion==1" @click="activar()" color="orange darken-4" flat="flat">
-                                Activar
+                                Activate
                             </v-btn>
                             <v-btn v-if="adAccion==2" @click="desactivar()" color="orange darken-4" flat="flat">
-                                Desactivar
+                                Deactivate
                             </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -131,15 +131,15 @@
                 <td>{{ props.item.email }}</td>
                 <td>
                     <div v-if="props.item.estado">
-                        <span class="blue--text">Activo</span>
+                        <span class="blue--text">Active</span>
                     </div>
                     <div v-else>
-                        <span class="red--text">Inactivo</span>
+                        <span class="red--text">Offline</span>
                     </div>
                 </td>                
                 </template>
                 <template v-slot:no-data>
-                <v-btn color="primary" @click="listar()">Resetear</v-btn>
+                <v-btn color="primary" @click="listar()">Reset</v-btn>
                 </template>
             </v-data-table>
         </v-flex>

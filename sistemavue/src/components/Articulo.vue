@@ -5,21 +5,21 @@
         <v-btn @click="crearPDF()">
           <v-icon>print</v-icon>
         </v-btn>
-        <v-toolbar-title>Artículos</v-toolbar-title>
+        <v-toolbar-title>Articles</v-toolbar-title>
         <v-divider class="mx-2" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-text-field
           class="text-xs-center"
           v-model="search"
           append-icon="search"
-          label="Búsqueda"
+          label="Search"
           single-line
           hide-details
         ></v-text-field>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on }">
-            <v-btn color="primary" dark class="mb-2" v-on="on">Nuevo</v-btn>
+            <v-btn color="primary" dark class="mb-2" v-on="on">New</v-btn>
           </template>
           <v-card>
             <v-card-title>
@@ -29,19 +29,19 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model="codigo" label="Código">
+                    <v-text-field v-model="codigo" label="Code">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-select
                       v-model="categoria"
                       :items="categorias"
-                      label="Categoría"
+                      label="Category"
                     >
                     </v-select>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
-                    <v-text-field v-model="nombre" label="Nombre">
+                    <v-text-field v-model="nombre" label="Name">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
@@ -49,11 +49,11 @@
                     </v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model="precio_venta" label="precio_venta">
+                    <v-text-field v-model="precio_venta" label="Sale Price">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
-                    <v-text-field v-model="descripcion" label="Descripción">
+                    <v-text-field v-model="descripcion" label="Description">
                     </v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12 v-show="valida">
@@ -69,22 +69,22 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" flat @click="close">Cancelar</v-btn>
-              <v-btn color="blue darken-1" flat @click="guardar">Guardar</v-btn>
+              <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click="guardar">Add</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
         <v-dialog v-model="adModal" max-width="290">
           <v-card>
             <v-card-title class="headline" v-if="adAccion == 1">
-              Activar Item
+              Activate Item
             </v-card-title>
             <v-card-title class="headline" v-if="adAccion == 2">
-              Desactivar Item
+              Deactivate Item
             </v-card-title>
             <v-card-text>
-              Estás a punto de <span v-if="adAccion == 1">activar </span>
-              <span v-if="adAccion == 2">desactivar </span> el item
+              You are about to <span v-if="adAccion == 1"> activate </span>
+              <span v-if="adAccion == 2">deactivate </span> the item
               {{ adNombre }}
             </v-card-text>
             <v-card-actions>
@@ -94,7 +94,7 @@
                 color="green darken-1"
                 flat="flat"
               >
-                Cancelar
+                Cancel
               </v-btn>
               <v-btn
                 v-if="adAccion == 1"
@@ -102,7 +102,7 @@
                 color="orange darken-4"
                 flat="flat"
               >
-                Activar
+                Activate
               </v-btn>
               <v-btn
                 v-if="adAccion == 2"
@@ -110,7 +110,7 @@
                 color="orange darken-4"
                 flat="flat"
               >
-                Desactivar
+                Deactivate
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -146,15 +146,15 @@
           <td>{{ props.item.descripcion }}</td>
           <td>
             <div v-if="props.item.estado">
-              <span class="blue--text">Activo</span>
+              <span class="blue--text">Active</span>
             </div>
             <div v-else>
-              <span class="red--text">Inactivo</span>
+              <span class="red--text">Offline</span>
             </div>
           </td>
         </template>
         <template v-slot:no-data>
-          <v-btn color="primary" @click="listar()">Resetear</v-btn>
+          <v-btn color="primary" @click="listar()">Reset</v-btn>
         </template>
       </v-data-table>
     </v-flex>
@@ -171,14 +171,14 @@ export default {
       search: "",
       articulos: [],
       headers: [
-        { text: "Opciones", value: "opciones", sortable: false },
+        { text: "Options", value: "opciones", sortable: false },
         { text: "Código", value: "codigo", sortable: false },
-        { text: "Nombre", value: "nombre", sortable: true },
-        { text: "Categoría", value: "categoria.nombre", sortable: true },
+        { text: "Name", value: "nombre", sortable: true },
+        { text: "Categoria", value: "categoria.nombre", sortable: true },
         { text: "Stock", value: "stock", sortable: false },
-        { text: "Precio Venta", value: "precio_venta", sortable: false },
-        { text: "Descripción", value: "descripcion", sortable: false },
-        { text: "Estado", value: "estado", sortable: false },
+        { text: "Sale Price", value: "precio_venta", sortable: false },
+        { text: "Description", value: "descripcion", sortable: false },
+        { text: "State", value: "estado", sortable: false },
       ],
       editedIndex: -1,
       _id: "",
@@ -199,7 +199,7 @@ export default {
   },
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
+      return this.editedIndex === -1 ? "New Registration" : "Editar registro";
     },
   },
   watch: {
